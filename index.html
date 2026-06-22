@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Global - Puerto Rico Around the World</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-blue: #005088;
+            --brand-orange: #ff5722;
+            --brand-teal: #11caa0;
+            --dark-slate: #1e293b;
+            --light-bg: #f8fafc;
+            --alert-red: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(0, 80, 136, 0.85)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 30px;
+            color: var(--dark-slate);
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 30px;
+            max-width: 1700px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-layout { grid-template-columns: 1fr; }
+        }
+
+        .card-panel {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: var(--brand-blue);
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 3px solid var(--brand-teal);
+            padding-bottom: 10px;
+        }
+
+        /* FORMULARIO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .full-width { grid-column: span 2; }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .input-box label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--dark-slate);
+            text-transform: uppercase;
+        }
+
+        .input-box input, .input-box textarea {
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .input-box textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .input-box input:focus, .input-box textarea:focus {
+            outline: none;
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.2);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+            grid-column: span 2;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand-orange), #e64a19);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.4);
+        }
+
+        .btn-reset {
+            background: #cbd5e1;
+            color: var(--dark-slate);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-reset:hover {
+            background: #94a3b8;
+            color: white;
+        }
+
+        /* CALENDARIO AGENDA */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-header button {
+            background: var(--brand-blue);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .calendar-header button:hover { background: #003d66; }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .day-name { font-weight: 700; color: #475569; padding: 5px 0; font-size: 0.9rem; text-transform: uppercase;}
+        
+        .calendar-day {
+            min-height: 105px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+        .calendar-day:hover { background: #e2e8f0; transform: translateY(-1px); }
+        .calendar-day.empty { background: transparent; cursor: default; border: none; }
+        
+        .day-number {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .events-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+            max-height: 70px;
+        }
+
+        .calendar-event {
+            font-size: 0.72rem;
+            padding: 3px 5px;
+            border-radius: 5px;
+            color: white;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+            line-height: 1.2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .event-viaje { background-color: #3b82f6; }
+        .event-deposito { background-color: #eab308; color: #1e293b; }
+        .event-veinte { background-color: #a855f7; }
+        .event-lista { background-color: #10b981; }
+        .event-vencimiento { background-color: #ef4444; }
+
+        /* LISTADO DE DESTINOS GRABADOS */
+        .destinations-list {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .destination-card {
+            display: flex;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid var(--brand-teal);
+        }
+
+        .destination-card img {
+            width: 130px;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .card-info h4 { color: var(--brand-blue); font-size: 1.2rem; margin-bottom: 5px; text-transform: capitalize;}
+        .card-info .desc-text { font-size: 0.85rem; color: #475569; margin-bottom: 8px; font-style: italic; background: #f8fafc; padding: 6px; border-radius: 6px; border-left: 3px solid #cbd5e1; }
+        .card-info p { font-size: 0.8rem; color: #64748b; margin-bottom: 2px; }
+        .badge-alert {
+            background-color: #fee2e2;
+            color: var(--alert-red);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-layout">
+    
+    <div class="card-panel">
+        <h2><i class="fa-solid fa-map-location-dot"></i> Programación de Viajes</h2>
+        <form id="tripForm" onsubmit="saveTrip(event)">
+            <div class="form-grid">
+                
+                <div class="input-box full-width">
+                    <label for="destino">Destino de Viaje</label>
+                    <input type="text" id="destino" required placeholder="Ej. París, Roma, Crucero por las Bahamas...">
+                </div>
+
+                <div class="input-box full-width">
+                    <label for="descripcion">Descripción del Viaje</label>
+                    <textarea id="descripcion" required placeholder="Escribe aquí los detalles del itinerario..."></textarea>
+                </div>
+
+                <div class="input-box">
+                    <label for="fechaViaje">Fecha de Viaje</label>
+                    <input type="date" id="fechaViaje" required>
+                </div>
+                <div class="input-box">
+                    <label for="fechaDeposito">Fecha de Depósito</label>
+                    <input type="date" id="fechaDeposito" required>
+                </div>
+                <div class="input-box">
+                    <label for="fechaVeinte">Fecha Pago del 20%</label>
+                    <input type="date" id="fechaVeinte" required>
+                </div>
+                <div class="input-box">
+                    <label for="fechaLista">Entrega Lista Nombres</label>
+                    <input type="date" id="fechaLista" required>
+                </div>
+                <div class="input-box full-width">
+                    <label for="fechaVencimiento">Fecha Final (Vencimiento)</label>
+                    <input type="date" id="fechaVencimiento" required>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Archivar Destino
+                    </button>
+                    <button type="button" class="btn-reset" onclick="limpiarFormularioActivo()" title="Borrar información actual antes de grabar">
+                        <i class="fa-solid fa-trash-can"></i> Reset
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+        <h3 style="margin-top: 30px; color: var(--brand-blue);">📍 Destinos Grabados (Orden por Fecha de Viaje)</h3>
+        <div class="destinations-list" id="destinationsContainer">
+            </div>
+    </div>
+
+    <div class="card-panel">
+        <div class="calendar-header">
+            <button onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+            <h2 id="calendarTitle" style="border:none; margin:0; padding:0;">Mes Año</h2>
+            <button onclick="changeMonth(1)">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid">
+            </div>
+    </div>
+</div>
+
+<script>
+    let trips = [];
+    let currentDisplayedDate = new Date();
+    
+    const defaultImage = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80";
+    const destKeywords = {
+        "europa": "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80",
+        "asia": "https://images.unsplash.com/photo-1535139262971-c51845709a48?auto=format&fit=crop&w=400&q=80",
+        "usa": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=400&q=80",
+        "central": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=400&q=80",
+        "sur": "https://images.unsplash.com/photo-1526331972164-8b6df1d20058?auto=format&fit=crop&w=400&q=80",
+        "mexico": "https://images.unsplash.com/photo-1512813583145-baaa340ef29f?auto=format&fit=crop&w=400&q=80",
+        "crucero": "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=400&q=80"
+    };
+
+    function getDestinationImage(destinoText) {
+        const text = destinoText.toLowerCase();
+        for (let key in destKeywords) {
+            if (text.includes(key)) return destKeywords[key];
+        }
+        return defaultImage; 
+    }
+
+    // INSTRUCCIÓN DE RESET: Limpia el formulario activo antes de ser grabado
+    function limpiarFormularioActivo() {
+        document.getElementById('tripForm').reset();
+        console.log("[CLEAN] Formulario borrado por el operador antes de someter.");
+    }
+
+    function saveTrip(e) {
+        e.preventDefault();
+        
+        const trip = {
+            id: Date.now(),
+            destino: document.getElementById('destino').value,
+            descripcion: document.getElementById('descripcion').value,
+            fechaViaje: document.getElementById('fechaViaje').value,
+            fechaDeposito: document.getElementById('fechaDeposito').value,
+            fechaVeinte: document.getElementById('fechaVeinte').value,
+            fechaLista: document.getElementById('fechaLista').value,
+            fechaVencimiento: document.getElementById('fechaVencimiento').value,
+        };
+
+        fetch('http://localhost:5000/api/add-trip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(trip)
+        }).catch(err => console.log("Backend Python inactivo, simulando de forma local."));
+
+        trips.push(trip);
+        trips.sort((a, b) => new Date(a.fechaViaje) - new Date(b.fechaViaje));
+        
+        // Ejecuta la limpieza de control automáticamente tras una grabación exitosa
+        limpiarFormularioActivo();
+        renderDestinations();
+        renderCalendar();
+    }
+
+    function renderDestinations() {
+        const container = document.getElementById('destinationsContainer');
+        container.innerHTML = '';
+        const hoy = new Date();
+
+        trips.forEach(t => {
+            const fVencimiento = new Date(t.fechaVencimiento);
+            const diffTime = fVencimiento - hoy;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            let alertaBadge = '';
+            if(diffDays <= 5 && diffDays >= 0) {
+                alertaBadge = `<div class="badge-alert"><i class="fa-solid fa-triangle-exclamation"></i> Vence en ${diffDays} días (Alerta por Email)</div>`;
+            }
+
+            container.innerHTML += `
+                <div class="destination-card">
+                    <img src="${getDestinationImage(t.destino)}" alt="Destino">
+                    <div class="card-info">
+                        <h4>${t.destino}</h4>
+                        <div class="desc-text">${t.descripcion}</div>
+                        <p>🛫 <b>Viaje:</b> ${t.fechaViaje}</p>
+                        <p>💵 <b>Depósito:</b> ${t.fechaDeposito} | 📈 <b>20%:</b> ${t.fechaVeinte}</p>
+                        <p>📋 <b>Lista:</b> ${t.fechaLista} | 🛑 <b>Cierre:</b> ${t.fechaVencimiento}</p>
+                        ${alertaBadge}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const title = document.getElementById('calendarTitle');
+        grid.innerHTML = '';
+
+        const year = currentDisplayedDate.getFullYear();
+        const month = currentDisplayedDate.getMonth();
+
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        title.innerText = `${meses[month]} ${year}`;
+
+        const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        diasSemana.forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+
+        const primerDia = new Date(year, month, 1).getDay();
+        const totalDias = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < primerDia; i++) {
+            grid.innerHTML += `<div class="calendar-day empty"></div>`;
+        }
+
+        for (let dia = 1; dia <= totalDias; dia++) {
+            const fechaActualStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            let eventsHTML = '<div class="events-container">';
+            
+            trips.forEach(t => {
+                if(t.fechaViaje === fechaActualStr) {
+                    eventsHTML += `<div class="calendar-event event-viaje" title="Salida de Vuelo: ${t.destino}">🛫 ${t.destino}</div>`;
+                }
+                if(t.fechaDeposito === fechaActualStr) {
+                    eventsHTML += `<div class="calendar-event event-deposito" title="Límite Depósito: ${t.destino}">💵 ${t.destino}</div>`;
+                }
+                if(t.fechaVeinte === fechaActualStr) {
+                    eventsHTML += `<div class="calendar-event event-veinte" title="Límite Pago 20%: ${t.destino}">📈 ${t.destino}</div>`;
+                }
+                if(t.fechaLista === fechaActualStr) {
+                    eventsHTML += `<div class="calendar-event event-lista" title="Entrega de Lista: ${t.destino}">📋 ${t.destino}</div>`;
+                }
+                if(t.fechaVencimiento === fechaActualStr) {
+                    eventsHTML += `<div class="calendar-event event-vencimiento" title="Vencimiento Final: ${t.destino}">🛑 ${t.destino}</div>`;
+                }
+            });
+            eventsHTML += '</div>';
+
+            grid.innerHTML += `
+                <div class="calendar-day">
+                    <span class="day-number">${dia}</span>
+                    ${eventsHTML}
+                </div>`;
+        }
+    }
+
+    function changeMonth(dir) {
+        currentDisplayedDate.setMonth(currentDisplayedDate.getMonth() + dir);
+        renderCalendar();
+    }
+
+    renderCalendar();
+</script>
+</body>
+</html>
